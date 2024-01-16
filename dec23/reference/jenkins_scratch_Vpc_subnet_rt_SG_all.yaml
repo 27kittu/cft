@@ -1,0 +1,150 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating a whole Development environment including jenkins server in public subnet in public subnet with other resources and private instances in private subnet to deploy web applications through Jenkins server to private subnet resources. Later, it private servers are load balanced to project web application to internet
+#Metadata:
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: 10.0.0.0/24
+    Description: CIDR block for the VPC
+      
+#Rules:
+#Mappings
+#Conditions:
+#Transforms:
+Resources:
+  DevVPC:
+    Description: VPC for the dev environment
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: dev-vpc
+        - Key: stack
+          Value: production
+  PublicSubnet:
+    Description: Public subnet for the Jenkins server and others
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DevVPC
+      CidrBlock: 10.0.0.0/26
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: 'us-east-1a'
+      Tags: 
+        - Key: Name
+          Value: dev-pub-subnet1
+  PrivateSubnet:
+    Description: Private subnet for the Application server security
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DevVPC
+      CidrBlock: 10.0.0.64/26
+      AvailabilityZone: 'us-east-1a'
+      Tags:
+        - Key: Name
+          Value: dev-prv-subnet1
+  PubSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref PubRouteTable
+
+#  PrvSubnetRouteTableAssociation:
+#    Type: AWS::EC2::SubnetRouteTableAssociation
+#    Properties:
+#      SubnetId: !Ref PrivateSubnet
+#      RouteTableId: !Ref PrvRouteTable
+  PubRouteTable:
+    Description: This route table is for public subnets
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref DevVPC
+#  DevPubRoute1:
+#    Description: Route from VPC to local
+#    Type: AWS::EC2::Route
+    #DependsOn:
+    #  - InternetGwDevVPC
+#    Properties:
+#       RouteTableId:
+#         !Ref PubRouteTable
+#       DestinationCidrBlock: !Ref VpcCidrBlock
+#       GatewayId: local
+  DevPubRoute2:
+    Description: Route for the public rt
+    Type: AWS::EC2::Route
+    DependsOn: 
+      - InternetGwDevVPC
+    Properties:
+       RouteTableId:
+         !Ref PubRouteTable
+       DestinationCidrBlock: 0.0.0.0/0
+       GatewayId:
+         !Ref InternetGwDevVPC
+  InternetGwDevVPC:
+    Type: AWS::EC2::InternetGateway
+    Properties: 
+      Tags:
+        - Key: Name
+          Value: dev-internetGW
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+         !Ref DevVPC
+      InternetGatewayId:
+         !Ref InternetGwDevVPC
+  JenkinsInstance:
+    Type: AWS::EC2::Instance
+    Description: Jenkins instance in Public subnet
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-0fc5d935ebf8bc3bc
+      KeyName: redkey
+      SubnetId: !Ref PublicSubnet
+      UserData:
+        Fn::Base64: | 
+          #!/bin/bash
+          apt update -y
+          apt install fontconfig openjdk-17-jre -y
+          wget -O /usr/share/keyrings/jenkins-keyring.asc \
+          https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+          apt-get update -y
+          apt-get install jenkins -y
+          systemctl start jenkins
+          systemctl enable jenkins
+      Tags:
+        - Key: Name
+          Value: jen0
+  TomcatInstance1:
+    Type: AWS::EC2::Instance
+    Description: Tomcat instance in Private subnet
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0fc5d935ebf8bc3bc
+      KeyName: redkey
+      SubnetId: !Ref PrivateSubnet
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl
+          cat >> /home/ubuntu/.vimrc<<eof
+          colorscheme ron
+          eof
+
+          apt install default-jdk -y
+          wget -P /opt https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.91/bin/apache-tomcat-8.5.91.zip
+          unzip /opt/apache-tomcat-8.5.91.zip -d /opt
+          mv /opt/apache-tomcat-8.5.91 /opt/tomcat
+          chmod 700 /opt/tomcat/bin/*.sh
+          sh /opt/tomcat/bin/startup.sh
+          chmod 777 -R /opt/tomcat/webapps && chown -R ubuntu:ubuntu /opt/tomcat/webapps
+      Tags: 
+        - Key: Name 
+          Value: tom1
+#Outputs:

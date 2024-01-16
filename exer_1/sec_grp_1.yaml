@@ -1,0 +1,11 @@
+AWSTemplateFormatVersion: 2013-09-09
+Description: This template is to create a simple security group
+Metadata:
+Parameters:
+Rules:
+Mappings:
+Conditions:
+Transform:
+Resources:
+Outputs:
+

@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS template for AWS EC2 with one SecurityGroup
+Parameters:
+    InstanceType:
+        Description: InstanceType of the EC2  
+        type: 'AWS::EC2Instance:InstanceType'
+                            
+Mappings: 
+  RegionMap: 
+    us-east-1: 
+      HVM64: "ami-0ff8a91507f77f867"
+      HVMG2: "ami-0a584ac55a7631c0c"
+    us-west-1: 
+      HVM64: "ami-0bdb828fd58c52235"
+      HVMG2: "ami-066ee5fd4a9ef77f1"
+    eu-west-1: 
+      HVM64: "ami-047bb4163c506cd98"
+      HVMG2: "ami-31c2f645"
+    ap-southeast-1: 
+      HVM64: "ami-08569b978cc4dfa10"
+      HVMG2: "ami-0be9df32ae9f92309"
+    ap-northeast-1: 
+      HVM64: "ami-06cd52961ce9f0d85"
+      HVMG2: "ami-053cdd503598e4a9d"
+      
+Resources:
+    EC2Instance:
+        Properties:
+            InstanceType:
+                Description: InstanceType of the EC2
+                Type: 'AWS::EC2::InstanceType'
+                Default: 't1.micro'
+            ImageId:
+                Description: ImageId based on region
+                Type: 'AWS::EC2::ImageId'
+                Value: !FindInMap
+                    - RegionMap
+                    - !Ref 'AWS::Region'
+                    - HVM64
+            
+    SSHLocation:
+        Description: The IP Address range that can be used to EC2
+        Type: String
+        MinLength: 9
+        MaxLength: 18
+        Default: 0.0.0.0/0                
+    InstanceSecurityGroup:
+        Type: 'AWS::EC2::SecurityGroup'
+        Properties:
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 22
+                  ToPort : 22
+                  CidrIp: !Ref SSHLocation
+Outputs:
+    InstanceId:
+        Value: 
+            !Ref EC2Instance
+    PublicIP:
+        Description: Public IP address of the newly created EC2
+        Value: 
+            !GetAtt [EC2Instance, PublicIP]

@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Create a jenkins server readily working
+#Metadata:
+#Parameters:
+#Rules:
+#Mappings:
+#Conditions:
+#Transforms:
+Resources:
+  JenkinsInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-0fc5d935ebf8bc3bc
+      KeyName: redkey
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          apt update -y 
+          apt install fontconfig openjdk-17-jre -y 
+          wget -O /usr/share/keyrings/jenkins-keyring.asc \
+          https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+          apt-get update -y
+          apt-get install jenkins -y 
+          systemctl start jenkins
+          systemctl enable jenkins
+      Tags:
+        - Key: Name
+          Value: jen0
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH port 22, 8080
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: 0.0.0.0/0
+      VpcId: vpc-008c78cfcca186e3d
+
+Outputs:
+  InstanceId:
+    Description: InstanceId of Jenkins server
+    Value: !Ref JenkinsInstance

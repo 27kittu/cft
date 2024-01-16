@@ -1,0 +1,39 @@
+  PrivateSubnet:
+    Description: Private subnet for the Application server security
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref DevVPC
+      CidrBlock: 10.0.0.64/26
+      AvailabilityZone: 'us-east-1a'
+      Tags:
+        - Key: Name
+          Value: dev-prv-subnet1
+  PrvRouteTable:
+    Description: Route table for the private subnet
+    Type: AWS::EC2:RouteTable
+    Properties:
+      VpcId: !Ref DevVPC
+      Tags:
+        - Key: Name
+          Value: dev-prv-rt
+  PrvRoute0:
+    Description: Route for private route table
+    Type: AWS::EC2::Route
+    DependsOn: !Ref DevPrvNat
+    Properties:
+      RouteTableId: !Ref PrvRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref DevPrvNat
+  PrvSubnetRtAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrvRouteTable
+  DevPrvNat:
+    Description: NAT Gateway for the private instances
+    Type: AWS::EC2::NAT
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      Tags: 
+        - Key: Name
+          Value: DevNAT1

@@ -1,0 +1,5 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template to install jenkins and form a stack
+Metadata:
+Parameters:
+

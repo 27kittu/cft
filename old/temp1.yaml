@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion:
+Description:
+Metadata:
+Parameters:
+Rules:
+Mappings:
+Conditions:
+Transforms:
+Resources:
+Output:

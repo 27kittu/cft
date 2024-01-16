@@ -1,0 +1,10 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: A stack with simple default resources
+Resources:
+  Instance1:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0fc5d935ebf8bc3bc
+      InstanceType: t2.micro
+      KeyName: redkey
+    

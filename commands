@@ -1,0 +1,28 @@
+To validate, 
+'aws cloudformation validate-template --template-body <file://template loc>
+
+
+-To launch a new EC2 instance :
+
+'aws cloudformation deploy --template-name <template> --stack-name <stack_name>'
+
+as in documentation:
+
+'aws cloudformation deploy --template-file /path_to_template/template.json --stack-name my-new-stack --parameter-overrides Key1=Value1 Key2=Value2 --tags Key1=Value1 Key2=Value2'
+
+
+-To estimate the cost of the template resources
+
+'aws cloudformation estimate-template-cost --template-body <template-name>'
+
+-To login through aws cli using 'ec2-instance-connect' 
+https://awscli.amazonaws.com/v2/documentation/api/latest/reference/ec2-instance-connect/send-ssh-public-key.html
+
+
+- Created a custom EC2 and finding the instance has no public ip enabled and
+
+
+- To get only the instance IDs of the instances:
+    'aws ec2 describe-instances | grep InstanceID'
+
+
