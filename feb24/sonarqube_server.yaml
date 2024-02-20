@@ -1,0 +1,14 @@
+AwsTemplateFormatVersion: 2010-09-09
+Description: Stack for sonarqube server in existing VPC for use with docker for now
+Parameters:
+  VpcCidrBlock:
+    Type: string
+    Default: 10.0.0.0/24
+    Description: VPC Cidr block for input to other objects
+Resources:
+  SonarInstance:
+    Description: Instance to install sonarqube
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.medium
+    
