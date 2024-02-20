@@ -1,0 +1,810 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+    Generator: "former2"
+Description: ""
+Resources:
+    EC2Instance:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0c7217cdde317cfec"
+            InstanceType: "t2.medium"
+            KeyName: "redkey"
+            AvailabilityZone: !Sub "${AWS::Region}c"
+            Tenancy: "default"
+            SubnetId: "subnet-02b3bcc12a10a92d4"
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0417635d99aae2604"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-091ad9e7cd4cb0736"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwgZG9ja2VyLmlvCgojY2hhbmdpbmcgdmltIGRlZmF1bHQgY29sb3JzY2hlbWUKCmNhdCA+IC9ob21lL3VidW50dS8udmltcmMgPDxlb2YKc3ludGF4IGVuYWJsZQpjb2xvcnNjaGVtZSByb24KYXV0b2NtZCBGaWxlVHlwZSB5YW1sIHNldGxvY2FsIHRzPTIgc3RzPTIgc3c9MiBleHBhbmR0YWIKZW9mCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiCnBhc3N3b3JkPSJ1YnVudHVAdXNlciIKYWRkdXNlciAtLWdlY29zICIiIC0tZGlzYWJsZWQtcGFzc3dvcmQgJHVzZXJuYW1lCmVjaG8gIiR7dXNlcm5hbWV9OiR7cGFzc3dvcmR9IiB8IGNocGFzc3dkCgojIGFkZGluZyB2aXN1ZG8gZmlsZQpjcCAvZXRjL3N1ZG9lcnMgL2V0Yy9zdWRvZXJzX2NvcHkKc2VkIC1pICdzL15yb290LipBTEwkL3Jvb3QgICAgQUxMPShBTEw6QUxMKSBBTExcbmFuc2libGUgQUxMPShBTEwpICAgICBOT1BBU1NXRDogQUxMLycgL2V0Yy9zdWRvZXJzCgojIGNoYW5naW5nIFBhc3N3b3JkIGF1dGhlbnRpY2F0aW9uCmNwIC9ldGMvc3NoL3NzaGRfY29uZmlnIC9ldGMvc3NoL3NzaGRfY29uZmlnLmJhawpzZWQgLWkgJ3MvUGFzc3dvcmRBdXRoZW50aWNhdGlvbiBuby9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIHllcy9nJyAvZXRjL3NzaC9zc2hkX2NvbmZpZwoKCiMgcmVzdGFydCBzc2hkIHNlcnZpY2UKc3lzdGVtY3RsIHJlc3RhcnQgc3NoZAoKZ3JvdXBhZGQgZG9ja2VyIC0tZ2lkIDIwMjQKdXNlcm1vZCAtYUcgZG9ja2VyIGFuc2libGUKCnVzZXJtb2QgLWFHIA=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "d_sonar_ans"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance2:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.medium"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Subnet2.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet13
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0eabfad36f4791c96"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "ans3_nex0"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance3:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance4.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet6
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-07696a13a8ee7cb94"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "tom0"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance4:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance5.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-07696a13a8ee7cb94"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwgZG9ja2VyLmlvCgojY2hhbmdpbmcgdmltIGRlZmF1bHQgY29sb3JzY2hlbWUKCmNhdCA+IC9ob21lL3VidW50dS8udmltcmMgPDxlb2YKc3ludGF4IGVuYWJsZQpjb2xvcnNjaGVtZSByb24KYXV0b2NtZCBGaWxlVHlwZSB5YW1sIHNldGxvY2FsIHRzPTIgc3RzPTIgc3c9MiBleHBhbmR0YWIKZW9mCgpzb3VyY2UgL2hvbWUvdWJ1bnR1Ly52aW1yYwoKIyBjb25maWd1cmluZyBhbnNpYmxlCnVzZXJuYW1lPSJhbnNpYmxlIiAKcGFzc3dvcmQ9InVidW50dUB1c2VyIgphZGR1c2VyIC0tZ2Vjb3MgIiIgLS1kaXNhYmxlZC1wYXNzd29yZCAkdXNlcm5hbWUKZWNobyAiJHt1c2VybmFtZX06JHtwYXNzd29yZH0iIHwgY2hwYXNzd2QKCiMgYWRkaW5nIHZpc3VkbyBmaWxlCmNwIC9ldGMvc3Vkb2VycyAvZXRjL3N1ZG9lcnNfY29weQpzZWQgLWkgJ3MvXnJvb3QuKkFMTCQvcm9vdCAgICBBTEw9KEFMTDpBTEwpIEFMTFxuYW5zaWJsZSBBTEw9KEFMTCkgICAgIE5PUEFTU1dEOiBBTEwvJyAvZXRjL3N1ZG9lcnMKCiMgY2hhbmdpbmcgUGFzc3dvcmQgYXV0aGVudGljYXRpb24KY3AgL2V0Yy9zc2gvc3NoZF9jb25maWcgL2V0Yy9zc2gvc3NoZF9jb25maWcuYmFrCgpzZWQgLWkgJ3MvUGFzc3dvcmRBdXRoZW50aWNhdGlvbiBuby9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIHllcy9nJyAvZXRjL3NzaC9zc2hkX2NvbmZpZwoKCiMgcmVzdGFydCBzc2hkIHNlcnZpY2UKc3lzdGVtY3RsIHJlc3RhcnQgc3NoZAo="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "doc0"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance5:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0c7217cdde317cfec"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance6.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet10
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0482c5836f3d997f8"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-091ad9e7cd4cb0736"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwgbmZzLWtlcm5lbC1zZXJ2ZXIKCiNjaGFuZ2luZyB2aW0gZGVmYXVsdCBjb2xvcnNjaGVtZQoKY2F0ID4gL2hvbWUvdWJ1bnR1Ly52aW1yYyA8PGVvZgpzeW50YXggZW5hYmxlCmNvbG9yc2NoZW1lIHJvbgphdXRvY21kIEZpbGVUeXBlIHlhbWwgc2V0bG9jYWwgdHM9MiBzdHM9MiBzdz0yIGV4cGFuZHRhYgplb2YKCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiIApwYXNzd29yZD0idWJ1bnR1QHVzZXIiCmFkZHVzZXIgLS1nZWNvcyAiIiAtLWRpc2FibGVkLXBhc3N3b3JkICR1c2VybmFtZQplY2hvICIke3VzZXJuYW1lfToke3Bhc3N3b3JkfSIgfCBjaHBhc3N3ZAoKIyBhZGRpbmcgdmlzdWRvIGZpbGUKY3AgL2V0Yy9zdWRvZXJzIC9ldGMvc3Vkb2Vyc19jb3B5CnNlZCAtaSAncy9ecm9vdC4qQUxMJC9yb290ICAgIEFMTD0oQUxMOkFMTCkgQUxMXG5hbnNpYmxlIEFMTD0oQUxMKSAgICAgTk9QQVNTV0Q6IEFMTC8nIC9ldGMvc3Vkb2VycwoKIyBjaGFuZ2luZyBQYXNzd29yZCBhdXRoZW50aWNhdGlvbgpjcCAvZXRjL3NzaC9zc2hkX2NvbmZpZyAvZXRjL3NzaC9zc2hkX2NvbmZpZy5iYWsKCnNlZCAtaSAncy9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIG5vL1Bhc3N3b3JkQXV0aGVudGljYXRpb24geWVzL2cnIC9ldGMvc3NoL3NzaGRfY29uZmlnCgpta2RpciAtcCAvbW50L25mc19zaGFyZQpjaG93biAtUiBub2JvZHk6bm9ncm91cCAvbW50L25mc19zaGFyZQpjaG1vZCAtUiA3NzcgL21udC9uZnNfc2hhcmUKY2F0ID4+IC9ldGMvZXhwb3J0czw8ZW9mCi9tbnQvc2hhcmUgMTAuMC4wLjAvMTYocncgc3luYyBub19zdWJ0cmVlX2NoZWNrIG5vX3Jvb3Rfc3F1YXNoKQplb2YKCmV4cG9ydGZzIC1hCgojIHJlc3RhcnQgc3NoZCBzZXJ2aWNlCnN5c3RlbWN0bCByZXN0YXJ0IHNzaGQKCg=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "nfs_1(/mnt/nfs_share))"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance6:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.medium"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance7.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet11
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0482c5836f3d997f8"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwKCiNjaGFuZ2luZyB2aW0gZGVmYXVsdCBjb2xvcnNjaGVtZQoKY2F0ID4gL2hvbWUvdWJ1bnR1Ly52aW1yYyA8PGVvZgpzeW50YXggZW5hYmxlCmNvbG9yc2NoZW1lIHJvbgphdXRvY21kIEZpbGVUeXBlIHlhbWwgc2V0bG9jYWwgdHM9MiBzdHM9MiBzdz0yIGV4cGFuZHRhYgplb2YKCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiIApwYXNzd29yZD0idWJ1bnR1QHVzZXIiCmFkZHVzZXIgLS1nZWNvcyAiIiAtLWRpc2FibGVkLXBhc3N3b3JkICR1c2VybmFtZQplY2hvICIke3VzZXJuYW1lfToke3Bhc3N3b3JkfSIgfCBjaHBhc3N3ZAoKIyBhZGRpbmcgdmlzdWRvIGZpbGUKY3AgL2V0Yy9zdWRvZXJzIC9ldGMvc3Vkb2Vyc19jb3B5CnNlZCAtaSAncy9ecm9vdC4qQUxMJC9yb290ICAgIEFMTD0oQUxMOkFMTCkgQUxMXG5hbnNpYmxlIEFMTD0oQUxMKSAgICAgTk9QQVNTV0Q6IEFMTC8nIC9ldGMvc3Vkb2VycwoKIyBjaGFuZ2luZyBQYXNzd29yZCBhdXRoZW50aWNhdGlvbgpjcCAvZXRjL3NzaC9zc2hkX2NvbmZpZyAvZXRjL3NzaC9zc2hkX2NvbmZpZy5iYWsKCnNlZCAtaSAncy9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIG5vL1Bhc3N3b3JkQXV0aGVudGljYXRpb24geWVzL2cnIC9ldGMvc3NoL3NzaGRfY29uZmlnCgoKIyByZXN0YXJ0IHNzaGQgc2VydmljZQpzeXN0ZW1jdGwgcmVzdGFydCBzc2hkCg=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "vim0_ans"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance7:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.medium"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance8.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-07696a13a8ee7cb94"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKYXB0IHVwZGF0ZSAteQphcHQgaW5zdGFsbCBmb250Y29uZmlnIG9wZW5qZGstMTctanJlIC15CndnZXQgLU8gL3Vzci9zaGFyZS9rZXlyaW5ncy9qZW5raW5zLWtleXJpbmcuYXNjIFwKaHR0cHM6Ly9wa2cuamVua2lucy5pby9kZWJpYW4tc3RhYmxlL2plbmtpbnMuaW8tMjAyMy5rZXkKZWNobyBkZWIgW3NpZ25lZC1ieT0vdXNyL3NoYXJlL2tleXJpbmdzL2plbmtpbnMta2V5cmluZy5hc2NdIFwKaHR0cHM6Ly9wa2cuamVua2lucy5pby9kZWJpYW4tc3RhYmxlIGJpbmFyeS8gfCBzdWRvIHRlZSBcCi9ldGMvYXB0L3NvdXJjZXMubGlzdC5kL2plbmtpbnMubGlzdCA+IC9kZXYvbnVsbAphcHQtZ2V0IHVwZGF0ZSAteQphcHQtZ2V0IGluc3RhbGwgamVua2lucyAteQpzeXN0ZW1jdGwgc3RhcnQgamVua2lucwpzeXN0ZW1jdGwgZW5hYmxlIGplbmtpbnMK"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "jen0"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance8:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance9.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet11
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0482c5836f3d997f8"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwKCiNjaGFuZ2luZyB2aW0gZGVmYXVsdCBjb2xvcnNjaGVtZQoKY2F0ID4gL2hvbWUvdWJ1bnR1Ly52aW1yYyA8PGVvZgpzeW50YXggZW5hYmxlCmNvbG9yc2NoZW1lIHJvbgphdXRvY21kIEZpbGVUeXBlIHlhbWwgc2V0bG9jYWwgdHM9MiBzdHM9MiBzdz0yIGV4cGFuZHRhYgplb2YKCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiIApwYXNzd29yZD0idWJ1bnR1QHVzZXIiCmFkZHVzZXIgLS1nZWNvcyAiIiAtLWRpc2FibGVkLXBhc3N3b3JkICR1c2VybmFtZQplY2hvICIke3VzZXJuYW1lfToke3Bhc3N3b3JkfSIgfCBjaHBhc3N3ZAoKIyBhZGRpbmcgdmlzdWRvIGZpbGUKY3AgL2V0Yy9zdWRvZXJzIC9ldGMvc3Vkb2Vyc19jb3B5CnNlZCAtaSAncy9ecm9vdC4qQUxMJC9yb290ICAgIEFMTD0oQUxMOkFMTCkgQUxMXG5hbnNpYmxlIEFMTD0oQUxMKSAgICAgTk9QQVNTV0Q6IEFMTC8nIC9ldGMvc3Vkb2VycwoKIyBjaGFuZ2luZyBQYXNzd29yZCBhdXRoZW50aWNhdGlvbgpjcCAvZXRjL3NzaC9zc2hkX2NvbmZpZyAvZXRjL3NzaC9zc2hkX2NvbmZpZy5iYWsKCnNlZCAtaSAncy9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIG5vL1Bhc3N3b3JkQXV0aGVudGljYXRpb24geWVzL2cnIC9ldGMvc3NoL3NzaGRfY29uZmlnCgoKIyByZXN0YXJ0IHNzaGQgc2VydmljZQpzeXN0ZW1jdGwgcmVzdGFydCBzc2hkCg=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "vim1_ans"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance9:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance10.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet6
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-07696a13a8ee7cb94"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "tom1"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance10:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.micro"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Instance11.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet11
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0482c5836f3d997f8"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwKCiNjaGFuZ2luZyB2aW0gZGVmYXVsdCBjb2xvcnNjaGVtZQoKY2F0ID4gL2hvbWUvdWJ1bnR1Ly52aW1yYyA8PGVvZgpzeW50YXggZW5hYmxlCmNvbG9yc2NoZW1lIHJvbgphdXRvY21kIEZpbGVUeXBlIHlhbWwgc2V0bG9jYWwgdHM9MiBzdHM9MiBzdz0yIGV4cGFuZHRhYgplb2YKCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiIApwYXNzd29yZD0idWJ1bnR1QHVzZXIiCmFkZHVzZXIgLS1nZWNvcyAiIiAtLWRpc2FibGVkLXBhc3N3b3JkICR1c2VybmFtZQplY2hvICIke3VzZXJuYW1lfToke3Bhc3N3b3JkfSIgfCBjaHBhc3N3ZAoKIyBhZGRpbmcgdmlzdWRvIGZpbGUKY3AgL2V0Yy9zdWRvZXJzIC9ldGMvc3Vkb2Vyc19jb3B5CnNlZCAtaSAncy9ecm9vdC4qQUxMJC9yb290ICAgIEFMTD0oQUxMOkFMTCkgQUxMXG5hbnNpYmxlIEFMTD0oQUxMKSAgICAgTk9QQVNTV0Q6IEFMTC8nIC9ldGMvc3Vkb2VycwoKIyBjaGFuZ2luZyBQYXNzd29yZCBhdXRoZW50aWNhdGlvbgpjcCAvZXRjL3NzaC9zc2hkX2NvbmZpZyAvZXRjL3NzaC9zc2hkX2NvbmZpZy5iYWsKCnNlZCAtaSAncy9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIG5vL1Bhc3N3b3JkQXV0aGVudGljYXRpb24geWVzL2cnIC9ldGMvc3NoL3NzaGRfY29uZmlnCgoKIyByZXN0YXJ0IHNzaGQgc2VydmljZQpzeXN0ZW1jdGwgcmVzdGFydCBzc2hkCg=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "vim2_ans"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2Instance11:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            ImageId: "ami-0fc5d935ebf8bc3bc"
+            InstanceType: "t2.medium"
+            KeyName: "redkey"
+            AvailabilityZone: !GetAtt EC2Subnet.AvailabilityZone
+            Tenancy: "default"
+            SubnetId: !Ref EC2Subnet11
+            EbsOptimized: false
+            SecurityGroupIds: 
+              - "sg-0482c5836f3d997f8"
+            SourceDestCheck: true
+            BlockDeviceMappings: 
+              - 
+                DeviceName: "/dev/sda1"
+                Ebs: 
+                    Encrypted: false
+                    VolumeSize: 8
+                    SnapshotId: "snap-0fe62e94bc2ecc9d5"
+                    VolumeType: "gp2"
+                    DeleteOnTermination: true
+            UserData: "IyEvYmluL2Jhc2gKCmFwdCB1cGRhdGUgLXkKYXB0IGluc3RhbGwgLXkgdmltIHppcCB0YXIgd2dldCBnaXQgbmV0LXRvb2xzIGN1cmwKCiNjaGFuZ2luZyB2aW0gZGVmYXVsdCBjb2xvcnNjaGVtZQoKY2F0ID4gL2hvbWUvdWJ1bnR1Ly52aW1yYyA8PGVvZgpzeW50YXggZW5hYmxlCmNvbG9yc2NoZW1lIHJvbgphdXRvY21kIEZpbGVUeXBlIHlhbWwgc2V0bG9jYWwgdHM9MiBzdHM9MiBzdz0yIGV4cGFuZHRhYgplb2YKCnNvdXJjZSAvaG9tZS91YnVudHUvLnZpbXJjCgojIGNvbmZpZ3VyaW5nIGFuc2libGUKdXNlcm5hbWU9ImFuc2libGUiIApwYXNzd29yZD0idWJ1bnR1QHVzZXIiCmFkZHVzZXIgLS1nZWNvcyAiIiAtLWRpc2FibGVkLXBhc3N3b3JkICR1c2VybmFtZQplY2hvICIke3VzZXJuYW1lfToke3Bhc3N3b3JkfSIgfCBjaHBhc3N3ZAoKIyBhZGRpbmcgdmlzdWRvIGZpbGUKY3AgL2V0Yy9zdWRvZXJzIC9ldGMvc3Vkb2Vyc19jb3B5CnNlZCAtaSAncy9ecm9vdC4qQUxMJC9yb290ICAgIEFMTD0oQUxMOkFMTCkgQUxMXG5hbnNpYmxlIEFMTD0oQUxMKSAgICAgTk9QQVNTV0Q6IEFMTC8nIC9ldGMvc3Vkb2VycwoKIyBjaGFuZ2luZyBQYXNzd29yZCBhdXRoZW50aWNhdGlvbgpjcCAvZXRjL3NzaC9zc2hkX2NvbmZpZyAvZXRjL3NzaC9zc2hkX2NvbmZpZy5iYWsKCnNlZCAtaSAncy9QYXNzd29yZEF1dGhlbnRpY2F0aW9uIG5vL1Bhc3N3b3JkQXV0aGVudGljYXRpb24geWVzL2cnIC9ldGMvc3NoL3NzaGRfY29uZmlnCgoKIyByZXN0YXJ0IHNzaGQgc2VydmljZQpzeXN0ZW1jdGwgcmVzdGFydCBzc2hkCg=="
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "son0_ans"
+            HibernationOptions: 
+                Configured: false
+            EnclaveOptions: 
+                Enabled: false
+
+    EC2VPC:
+        Type: "AWS::EC2::VPC"
+        Properties:
+            CidrBlock: "10.0.0.0/24"
+            EnableDnsSupport: true
+            EnableDnsHostnames: true
+            InstanceTenancy: "default"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "dev-vpc"
+              - 
+                Key: "stack"
+                Value: "production"
+
+    EC2VPC2:
+        Type: "AWS::EC2::VPC"
+        Properties:
+            CidrBlock: "192.168.0.0/24"
+            EnableDnsSupport: true
+            EnableDnsHostnames: false
+            InstanceTenancy: "default"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_VPC"
+
+    EC2VPC3:
+        Type: "AWS::EC2::VPC"
+        Properties:
+            CidrBlock: "10.0.0.0/16"
+            EnableDnsSupport: true
+            EnableDnsHostnames: true
+            InstanceTenancy: "default"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "wheel_1-vpc"
+
+    EC2KeyPair:
+        Type: "AWS::EC2::KeyPair"
+        Properties:
+            KeyName: "redkey"
+            KeyType: "rsa"
+
+    EC2Subnet:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet6.AvailabilityZone
+            CidrBlock: "10.0.0.0/26"
+            VpcId: !Ref EC2VPC
+            MapPublicIpOnLaunch: true
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "dev-pub-subnet1"
+
+    EC2Subnet2:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet3.AvailabilityZone
+            CidrBlock: "192.168.0.224/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pri_4"
+
+    EC2Subnet3:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet4.AvailabilityZone
+            CidrBlock: "192.168.0.160/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pri_2"
+
+    EC2Subnet4:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet5.AvailabilityZone
+            CidrBlock: "192.168.0.96/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pub_4"
+
+    EC2Subnet5:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet7.AvailabilityZone
+            CidrBlock: "192.168.0.192/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pri_3"
+
+    EC2Subnet6:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet10.AvailabilityZone
+            CidrBlock: "10.0.0.64/26"
+            VpcId: !Ref EC2VPC
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "dev-prv-subnet1"
+
+    EC2Subnet7:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet8.AvailabilityZone
+            CidrBlock: "192.168.0.64/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pub_3"
+
+    EC2Subnet8:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet9.AvailabilityZone
+            CidrBlock: "192.168.0.32/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pub_2"
+
+    EC2Subnet9:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet13.AvailabilityZone
+            CidrBlock: "192.168.0.128/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pri_1"
+
+    EC2Subnet10:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet11.AvailabilityZone
+            CidrBlock: "10.0.128.0/20"
+            VpcId: !Ref EC2VPC3
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-subnet-private1-${EC2Subnet11.AvailabilityZone}"
+
+    EC2Subnet11:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !Sub "${AWS::Region}a"
+            CidrBlock: "10.0.0.0/20"
+            VpcId: !Ref EC2VPC3
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-subnet-public1-${AWS::Region}a"
+
+    EC2Subnet12:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !GetAtt EC2Subnet14.AvailabilityZone
+            CidrBlock: "10.0.144.0/20"
+            VpcId: !Ref EC2VPC3
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-subnet-private2-${EC2Subnet14.AvailabilityZone}"
+
+    EC2Subnet13:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !Sub "${AWS::Region}d"
+            CidrBlock: "192.168.0.0/27"
+            VpcId: !Ref EC2VPC2
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_pub_1"
+
+    EC2Subnet14:
+        Type: "AWS::EC2::Subnet"
+        Properties:
+            AvailabilityZone: !Sub "${AWS::Region}b"
+            CidrBlock: "10.0.16.0/20"
+            VpcId: !Ref EC2VPC3
+            MapPublicIpOnLaunch: false
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-subnet-public2-${AWS::Region}b"
+
+    EC2InternetGateway:
+        Type: "AWS::EC2::InternetGateway"
+        Properties:
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_IG"
+
+    EC2InternetGateway2:
+        Type: "AWS::EC2::InternetGateway"
+        Properties:
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "wheel_1-igw"
+
+    EC2InternetGateway3:
+        Type: "AWS::EC2::InternetGateway"
+        Properties:
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "dev-internetGW"
+
+    EC2EIP:
+        Type: "AWS::EC2::EIP"
+        Properties:
+            Domain: "vpc"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-eip-${EC2Instance3.AvailabilityZone}"
+
+    EC2EIPAssociation:
+        Type: "AWS::EC2::EIPAssociation"
+        Properties:
+            AllocationId: !GetAtt EC2EIP.AllocationId
+            NetworkInterfaceId: "eni-059c525c84790726c"
+            PrivateIpAddress: "10.0.9.125"
+
+    EC2EIP2:
+        Type: "AWS::EC2::EIP"
+        Properties:
+            Domain: "vpc"
+
+    EC2EIPAssociation2:
+        Type: "AWS::EC2::EIPAssociation"
+        Properties:
+            AllocationId: !GetAtt EC2EIP2.AllocationId
+            NetworkInterfaceId: "eni-00e3c60f5a1419551"
+            PrivateIpAddress: "10.0.0.16"
+
+    EC2EIP3:
+        Type: "AWS::EC2::EIP"
+        Properties:
+            Domain: "vpc"
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "test_VPC-eip-${EC2Instance3.AvailabilityZone}"
+
+    EC2RouteTable:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC3
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-rtb-private2-${EC2Subnet12.AvailabilityZone}"
+
+    EC2RouteTable2:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC2
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_VPC_PUB_rt"
+
+    EC2RouteTable3:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC
+
+    EC2RouteTable4:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC3
+
+    EC2RouteTable5:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC3
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "wheel_1-rtb-public"
+
+    EC2RouteTable6:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "dev-prv-rt"
+
+    EC2RouteTable7:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC
+
+    EC2RouteTable8:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC2
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_VPC_PRI_rt"
+
+    EC2RouteTable9:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC3
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-rtb-private1-${EC2Instance3.AvailabilityZone}"
+
+    EC2RouteTable10:
+        Type: "AWS::EC2::RouteTable"
+        Properties:
+            VpcId: !Ref EC2VPC2
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "prod_VPC_rt"
+
+    EC2Route:
+        Type: "AWS::EC2::Route"
+        Properties:
+            DestinationCidrBlock: "0.0.0.0/0"
+            NatGatewayId: !Ref EC2NatGateway2
+            RouteTableId: !Ref EC2RouteTable
+
+    EC2Route2:
+        Type: "AWS::EC2::Route"
+        Properties:
+            DestinationCidrBlock: "0.0.0.0/0"
+            GatewayId: !Ref EC2InternetGateway
+            RouteTableId: !Ref EC2RouteTable2
+
+    EC2Route3:
+        Type: "AWS::EC2::Route"
+        Properties:
+            DestinationCidrBlock: "0.0.0.0/0"
+            GatewayId: !Ref EC2InternetGateway2
+            RouteTableId: !Ref EC2RouteTable5
+
+    EC2Route4:
+        Type: "AWS::EC2::Route"
+        Properties:
+            DestinationCidrBlock: "0.0.0.0/0"
+            NatGatewayId: !Ref EC2NatGateway
+            RouteTableId: !Ref EC2RouteTable6
+
+    EC2Route5:
+        Type: "AWS::EC2::Route"
+        Properties:
+            DestinationCidrBlock: "0.0.0.0/0"
+            GatewayId: !Ref EC2InternetGateway3
+            RouteTableId: !Ref EC2RouteTable7
+
+    EC2NatGateway:
+        Type: "AWS::EC2::NatGateway"
+        Properties:
+            SubnetId: !Ref EC2Subnet
+            Tags: 
+              - 
+                Key: "Name"
+                Value: "DevNAT1"
+            AllocationId: !GetAtt EC2EIP2.AllocationId
+
+    EC2NatGateway2:
+        Type: "AWS::EC2::NatGateway"
+        Properties:
+            SubnetId: !Ref EC2Subnet11
+            Tags: 
+              - 
+                Key: "Name"
+                Value: !Sub "wheel_1-nat-public1-${EC2Instance3.AvailabilityZone}"
+            AllocationId: !GetAtt EC2EIP.AllocationId
+
+    EC2SubnetRouteTableAssociation:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable
+            SubnetId: !Ref EC2Subnet12
+
+    EC2SubnetRouteTableAssociation2:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable2
+            SubnetId: !Ref EC2Subnet13
+
+    EC2SubnetRouteTableAssociation3:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable5
+            SubnetId: !Ref EC2Subnet11
+
+    EC2SubnetRouteTableAssociation4:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable5
+            SubnetId: !Ref EC2Subnet14
+
+    EC2SubnetRouteTableAssociation5:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable6
+            SubnetId: !Ref EC2Subnet6
+
+    EC2SubnetRouteTableAssociation6:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable7
+            SubnetId: !Ref EC2Subnet
+
+    EC2SubnetRouteTableAssociation7:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable9
+            SubnetId: !Ref EC2Subnet10
+
+    EC2SubnetRouteTableAssociation8:
+        Type: "AWS::EC2::SubnetRouteTableAssociation"
+        Properties:
+            RouteTableId: !Ref EC2RouteTable10
+            SubnetId: !Ref EC2Subnet9
+
+

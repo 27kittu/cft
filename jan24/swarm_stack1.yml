@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack to run one Master node and two Worker nodes in a docker swarm cluster
+Parameters:
+  VpcCidrBlock:
+    type: String
+    Default: 192.168.0.0/24
+    Description: Cidr block for the VPC
+Resources:
+  SwarmVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostname: true
+      Tags:
+        - Key: Name
+          Value: SwarmVPC
+  
+  PubSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SwarmVpc
+      CidrBlock: 192.168.0.0/26
+      Tags:
+        - Key: Name
+          Value: PubSubnet1SwarmVPC
+      
+  InternetGw1:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      
