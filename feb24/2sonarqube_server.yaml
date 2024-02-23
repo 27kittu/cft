@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack for sonarqube server in existing VPC for use with docker for now
+Resources:
+  SonarInstance:
+    Description: Instance to install sonarqube
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-03f4878755434977f
+      InstanceType: t2.medium
+      KeyName: loyal
+      NetworkInterfaces:
+       - AssociatePublicIpAddress: true
+         DeviceIndex: 0
+         SubnetId: subnet-01bf8f2328590487a
+         GroupSet: 
+           - sg-055d0217c45a09540
+      Tags:
+        - Key: Name
+          Value: sonar
+      UserData:  
+        Fn::Base64: | 
+          #!/bin/bash
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl openjdk-11-jre-headless
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD:ALL/' /etc/sudoers
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          systemctl restart sshd
+
+          adduser --gecos '' --home /home/sonar --shell /bin/bash --disabled-password sonar
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nsonar ALL=(ALL)     NOPASSWD:ALL/' /etc/sudoers
+          wget -P /opt  https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.2.1.78527.zip
+          unzip /opt/sonarqube-10.2.1.78527.zip -d /opt
+          mv /opt/sonarqube-10.2.1.78527 /opt/sonarqube
+          chown sonar:sonar -R /opt/sonarqube
+          chmod 775 -R /opt/sonarqube

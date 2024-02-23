@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack for sonarqube server in existing VPC for use with docker for now
+Resources:
+  SonarInstance:
+    Description: Instance to install sonarqube
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-05a5bb48beb785bf1 
+      InstanceType: t2.medium
+      KeyName: loyal
+      NetworkInterfaces:
+       - AssociatePublicIpAddress: true
+         DeviceIndex: 0
+         SubnetId: subnet-01bf8f2328590487a
+         GroupSet: 
+           - sg-055d0217c45a09540
+      Tags:
+        - Key: Name
+          Value: sonarRed
+      UserData:  
+        Fn::Base64: | 
+          #!/bin/bash
+          yum update -y
+          yum install -y vim zip tar wget git net-tools curl java-11-openjdk-devel
+            
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          # configuring ansible
+          user="ansible"
+          pass="ec2@redhat"
+          useradd -m -U $user
+          echo "$pass" | passwd --stdin "$user"
+          # adding visudo file'
+          cp /etc/sudoers /etc/sudoers.bak
+          sed -i 's/root\s*ALL=(ALL)\s*ALL/root    ALL=(ALL)       ALL\nansible ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
+          # changing Password authentication
+          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          # restart sshd service
+          systemctl restart sshd
+
+          # Creating a new 'Sonar' user
+          sudo adduser -m -s /bin/bash -U sonar
+          cp /etc/sudoers /etc/sudoers.bak
+          sed -i 's/root\s*ALL=(ALL)\s*ALL/root    ALL=(ALL)       ALL\nsonar ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
+          wget -P /opt  https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-10.2.1.78527.zip
+          unzip /opt/sonarqube-10.2.1.78527.zip -d /opt
+          mv /opt/sonarqube-10.2.1.78527 /opt/sonarqube
+          chown sonar:sonar -R /opt/sonarqube
+          chmod 775 -R /opt/sonarqube

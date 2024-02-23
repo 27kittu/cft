@@ -1,10 +1,10 @@
-AWSTemplateFormatVersion
-Description
-Metadata
-Parameters
-Rules
-Mappings
-Conditions
-Transform
-Resources
-Outputs
+AWSTemplateFormatVersion: Versions to identify the capabilities of the template 
+Description		: Description about the details of the templates(consequent resources)
+Metadata(optional)	: Customizes and provide details about the template and also installs the applications for each resource
+Parameters(optional)	: enables us to input custom values to the template each time we create or update a stack
+Rules(optional)		: used to validate a set parameters passed to the template during stack creation 
+Mappings(optional)	: matches the key to a corresponding set of values in a mapped list or dict
+Conditions(optional)	: describe the circumstances under which the entities are created or configured
+Transform(optional)	: specifies one or more macros that AWS CloudFormation uses to process the template
+Resources		: declares the AWS resources that you want to include in the stack
+Outputs(optional)	: declares output values that you can import into other stacks, return in response or view on the AWS CFT

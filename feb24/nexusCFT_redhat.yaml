@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack for Nexus server in existing VPC for use with docker for now
+Resources:
+  SonarInstance:
+    Description: Instance to install Nexus
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-05a5bb48beb785bf1 
+      InstanceType: t2.medium
+      KeyName: loyal
+      NetworkInterfaces:
+       - AssociatePublicIpAddress: true
+         DeviceIndex: 0
+         SubnetId: subnet-01bf8f2328590487a
+         GroupSet: 
+           - sg-055d0217c45a09540
+      Tags:
+        - Key: Name
+          Value: nexusRed
+      UserData:  
+        Fn::Base64: | 
+          #!/bin/bash
+          yum update -y
+          yum install -y vim zip tar wget git net-tools curl java-1.8.0-openjdk
+            
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          # configuring ansible
+          user="ansible"
+          pass="ec2@redhat"
+          useradd -m -U $user
+          echo "$pass" | passwd --stdin "$user"
+          # adding visudo file'
+          cp /etc/sudoers /etc/sudoers.bak
+          sed -i 's/root\s*ALL=(ALL)\s*ALL/root    ALL=(ALL)       ALL\nansible ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          # restart sshd service
+          systemctl restart sshd
+
+          # Creating a new 'nexus' user
+          sudo adduser -m -s /bin/bash -U nexus
+          sed -i 's/root\s*ALL=(ALL)\s*ALL/root    ALL=(ALL)       ALL\nnexus ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
+          wget -P /opt https://download.sonatype.com/nexus/3/nexus-3.65.0-02-unix.tar.gz
+          tar -xzvf /opt/nexus-3.65.0-02-unix.tar.gz -C /opt
+          mkdir /opt/nexus          
+          mv /opt/nexus-3.65.0-02 /opt/sonatype-work /opt/nexus
+          chown nexus:nexus -R /opt/nexus
+          chmod 775 -R /opt/nexus
