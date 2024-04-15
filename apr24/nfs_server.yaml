@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack to create an NFS server 
+Resources:
+  NfsSG:
+    Description: Security group for the NFS server
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      SubnetId: subnet-015f8802d59f8f249
+      GroupDescription: Security Group for NFS port
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 2049
+          ToPort: 2049
+  NfsServer:
+    Description: Creates a NFS server
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-080e1f13689e07408
+      InstanceType: t2.micro
+      #SubnetId: subnet-015f8802d59f8f249
+      KeyName: spirit
+      SecurityGroupIds:
+        - !Ref NfsSG
+      Tags:
+        - Key: Name
+          Value: nfs 
+      UserData:
+        Fn::Base64: | 
+          !/bin/bash
+          
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl docker.io nfs-kernel-server
+
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+          
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+          
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          
+          # restart sshd service
+          systemctl restart sshd
+
+          # Configuring NFS server
+          mkdir /mnt/nfs1
+          chmod -R 777 /mnt/nfs1       
+          chown -R nobody:nogroup /mnt/nfs1
+
+          cat >>/etc/exports<<eof
+          /mnt/nfs1 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash) 0 0 
+          systemctl restart nfs-kernel-server

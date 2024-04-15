@@ -6,7 +6,7 @@ Parameters:
     Default: 192.168.0.0/24
     Description: Cidr block for the VPC
 Resources:
-  SwarmVpc:
+  SpiritVpc:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref VpcCidrBlock
@@ -14,16 +14,16 @@ Resources:
       EnableDnsHostname: true
       Tags:
         - Key: Name
-          Value: SwarmVPC
+          Value: SpiritVPC
   
   PubSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref SwarmVpc
+      VpcId: !Ref SpiritVpc
       CidrBlock: 192.168.0.0/26
       Tags:
         - Key: Name
-          Value: PubSubnet1SwarmVPC
+          Value: PubSubnet1SpriritVPC
       
   InternetGw1:
     Type: AWS::EC2::InternetGateway
