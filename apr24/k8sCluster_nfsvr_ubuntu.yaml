@@ -1,0 +1,538 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates all the infrastructure for Kubernetes cluster including security groups in a ready-to-use manner
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Description: Cidrblock to assign to the VPC
+    Default: 10.0.0.0/24
+  KeyName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of the existing keypair
+    Default: spirit
+Resources:
+  K8sVpc:
+    Type: AWS::EC2::VPC
+    Description: VPC dedicated for k8s cluster
+    Properties: 
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: k8s
+  K8sPubSubnet1:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for K8s server placement
+    Properties:
+      VpcId: !Ref K8sVpc
+      CidrBlock: 10.0.0.0/26
+      MapPublicIpOnLaunch: true
+      #AvailabilityZone: ap-east-1a
+      Tags:
+        - Key: Name
+          Value: k8s
+  K8sPubSubnet2:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for K8s server placement
+    Properties:
+      VpcId: !Ref K8sVpc
+      CidrBlock: 10.0.0.64/26
+      MapPublicIpOnLaunch: true
+      #AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: k8s
+  K8sPubSubnet3:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for K8s server placement
+    Properties:
+      VpcId: !Ref K8sVpc
+      CidrBlock: 10.0.0.128/26
+      MapPublicIpOnLaunch: true
+      #AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: k8s
+  K8sPubSubnet4:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for K8s server placement
+    Properties:
+      VpcId: !Ref K8sVpc
+      CidrBlock: 10.0.0.192/26
+      MapPublicIpOnLaunch: true
+      #AvailabilityZone: us-east-1b
+      Tags:
+        - Key: Name
+          Value: k8s
+  #SecurityGroup1:
+  #  Type: 'AWS::EC2::SecurityGroup'
+   # Properties:
+   #   GroupDescription: Allow connections from specified source security group
+  #SGroupIngress:
+  #  Type: AWS::EC2::SecurityGroupIngress
+    #Properties:
+     # - IpProtocol: '-1'
+      #  FromPort: '0'
+       ## ToPort: '65535'
+        #SourceSecurityGroupName: !Ref SecurityGroup1
+        #SourceSecurityGroupOwnerId: '654654506058'
+#  SecurityGroup2:
+ #   Type: 'AWS::EC2::SecurityGroup'
+  #  Properties:
+   #   GroupDescription: Allow connections from specified source security group
+    #  SecurityGroupIngress:
+     # - IpProtocol: '-1'
+      #  FromPort: '0'
+       # ToPort: '65535'
+        #CidrIp: 0.0.0.0/0
+  K8sInternetGw:
+    Type: AWS::EC2::InternetGateway
+    Description: Internet gateway for the VPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: k8s
+  VpcToInternet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref K8sVpc
+      InternetGatewayId: !Ref K8sInternetGw
+  K8sPubRt:
+    Type: AWS::EC2::RouteTable
+    Description: RouteTable for K8sVpc
+    Properties: 
+      VpcId: !Ref K8sVpc
+  K8sPubRou1:
+    Type: AWS::EC2::Route
+    Description: Route from Vpc to InternetGw
+    DependsOn:
+      - K8sInternetGw
+    Properties:
+      RouteTableId: !Ref K8sPubRt
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref K8sInternetGw
+  K8sPubSubnetAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Description: Route from Vpc to subnet1
+    Properties:
+      SubnetId: !Ref K8sPubSubnet1
+      RouteTableId: !Ref K8sPubRt
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup                              
+    Properties:                     
+      GroupDescription: This provides SG for all hte vpc      
+      VpcId: !Ref K8sVpc
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0 
+  K8sMaster:
+    Type: AWS::EC2::Instance
+    Description: K8s Master instance in Public subnet
+    Properties:
+      InstanceType: t2.medium
+      ImageId: ami-080e1f13689e07408
+      KeyName: spirit
+      SubnetId: !Ref K8sPubSubnet1
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      Tags:
+        - Key: Name
+          Value: k8s0
+        - Key: label
+          Value: k8s
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+
+          #2) Disable swap & add kernel settings
+          swapoff -a
+          sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+          #3) Install containerd run time
+          apt-get update -y
+          apt-get install ca-certificates curl gnupg lsb-release -y
+
+          # Add Docker’s official GPG key:
+
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+          #Use follwing command to set up the repository:
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          # Install containerd
+          apt-get update -y
+          apt-get install containerd.io -y
+
+          # Generate default configuration file for containerd
+          containerd config default > /etc/containerd/config.toml
+
+          sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+          # Restart and enable containerd service
+
+          systemctl restart containerd
+          systemctl enable containerd
+
+          #4) Add  kernel settings & Enable IP tables(CNI Prerequisites)
+          cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+          overlay
+          br_netfilter
+          EOF
+
+          modprobe overlay
+          modprobe br_netfilter
+
+          cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+          EOF
+
+          sysctl --system
+
+          #5) Installing kubeadm, kubelet and kubectl
+          apt-get update
+          apt-get install -y apt-transport-https ca-certificates curl
+
+          # Download the Google Cloud public signing key:
+          #curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+          #curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          #echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          
+          # Update apt package index, install kubelet, kubeadm and kubectl
+          apt-get update
+          apt-get install -y kubelet kubeadm kubectl
+
+          # apt-mark hold will prevent the package from being upgraded.
+          apt-mark hold kubelet kubeadm kubectl
+
+          # Enable and start kubelet service
+          systemctl daemon-reload
+          systemctl start kubelet
+          systemctl enable kubelet.service
+
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl
+
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+
+
+          # restart sshd service
+          systemctl restart sshd
+
+  K8sWorker1:
+    Type: AWS::EC2::Instance
+    Description: K8s worker instance in Public subnet
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-080e1f13689e07408
+      KeyName: spirit
+      SubnetId: !Ref K8sPubSubnet1
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      Tags:
+        - Key: Name
+          Value: k8s1
+        - Key: label
+          Value: k8s
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+
+          #2) Disable swap & add kernel settings
+          swapoff -a
+          sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+          #3) Install containerd run time
+          apt-get update -y
+          apt-get install ca-certificates curl gnupg lsb-release -y
+
+          # Add Docker’s official GPG key:
+
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+          #Use follwing command to set up the repository:
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          # Install containerd
+          apt-get update -y
+          apt-get install containerd.io -y
+
+          # Generate default configuration file for containerd
+          containerd config default > /etc/containerd/config.toml
+
+          sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+          # Restart and enable containerd service
+
+          systemctl restart containerd
+          systemctl enable containerd
+
+          #4) Add  kernel settings & Enable IP tables(CNI Prerequisites)
+          cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+          overlay
+          br_netfilter
+          EOF
+
+          modprobe overlay
+          modprobe br_netfilter
+
+          cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+          EOF
+
+          sysctl --system
+
+          #5) Installing kubeadm, kubelet and kubectl
+          apt-get update
+          apt-get install -y apt-transport-https ca-certificates curl
+
+          # Download the Google Cloud public signing key:
+          #curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          #echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          #curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+
+          # Update apt package index, install kubelet, kubeadm and kubectl
+          apt-get update
+          apt-get install -y kubelet kubeadm kubectl
+
+          # apt-mark hold will prevent the package from being upgraded.
+          apt-mark hold kubelet kubeadm kubectl
+
+          # Enable and start kubelet service
+          systemctl daemon-reload
+          systemctl start kubelet
+          systemctl enable kubelet.service
+
+
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl
+
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+
+
+          # restart sshd service
+          systemctl restart sshd
+  K8sWorker2:
+    Type: AWS::EC2::Instance
+    Description: K8s worker instance in Public subnet
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-080e1f13689e07408
+      KeyName: spirit
+      SubnetId: !Ref K8sPubSubnet1
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      Tags:
+        - Key: Name 
+          Value: k8s2
+        - Key: label
+          Value: k8s
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+
+          #2) Disable swap & add kernel settings
+          swapoff -a
+          sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+          #3) Install containerd run time
+          apt-get update -y
+          apt-get install ca-certificates curl gnupg lsb-release -y
+
+          # Add Docker’s official GPG key:
+
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+          #Use follwing command to set up the repository:
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          # Install containerd
+          apt-get update -y
+          apt-get install containerd.io -y
+
+          # Generate default configuration file for containerd
+          containerd config default > /etc/containerd/config.toml
+
+          sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+
+          # Restart and enable containerd service
+
+          systemctl restart containerd
+          systemctl enable containerd
+
+          #4) Add  kernel settings & Enable IP tables(CNI Prerequisites)
+          cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+          overlay
+          br_netfilter
+          EOF
+
+          modprobe overlay
+          modprobe br_netfilter
+
+          cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+          net.bridge.bridge-nf-call-iptables  = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward                 = 1
+          EOF
+
+          sysctl --system
+
+          #5) Installing kubeadm, kubelet and kubectl
+          apt-get update
+          apt-get install -y apt-transport-https ca-certificates curl
+
+          # Download the Google Cloud public signing key:
+          #curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+          #echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list 
+
+          # Update apt package index, install kubelet, kubeadm and kubectl
+          apt-get update
+          apt-get install -y kubelet kubeadm kubectl
+
+          # apt-mark hold will prevent the package from being upgraded.
+          apt-mark hold kubelet kubeadm kubectl
+
+          # Enable and start kubelet service
+          systemctl daemon-reload
+          systemctl start kubelet
+          systemctl enable kubelet.service
+
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl
+
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+
+
+          # restart sshd service
+          systemctl restart sshd
+  NfsServer:
+    Description: Creates a NFS server
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-080e1f13689e07408
+      InstanceType: t2.micro
+      SubnetId: !Ref K8sPubSubnet1 
+      KeyName: spirit
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      Tags:
+        - Key: Name
+          Value: nfs 
+      UserData:
+        Fn::Base64: | 
+          #!/bin/bash
+          
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl docker.io nfs-kernel-server
+
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+          
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+          
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          
+          # restart sshd service
+          systemctl restart sshd
+
+          # Configuring NFS server
+          mkdir /mnt/nfs1
+          chmod -R 777 /mnt/nfs1       
+          chown -R nobody:nogroup /mnt/nfs1
+
+          cat >>/etc/exports<<eof
+          /mnt/nfs1 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash) 0 0 
+          eof
+          systemctl restart nfs-kernel-server

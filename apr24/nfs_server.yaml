@@ -1,23 +1,30 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: Stack to create an NFS server 
+Parameters:
+  SnId:
+    Description: subnetId 
+    Type: String
+    Default: subnet-015f8802d59f8f249
 Resources:
   NfsSG:
     Description: Security group for the NFS server
     Type: AWS::EC2::SecurityGroup
     Properties:
-      SubnetId: subnet-015f8802d59f8f249
       GroupDescription: Security Group for NFS port
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 2049
           ToPort: 2049
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
   NfsServer:
     Description: Creates a NFS server
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-080e1f13689e07408
       InstanceType: t2.micro
-      #SubnetId: subnet-015f8802d59f8f249
+      SubnetId: !Ref SnId
       KeyName: spirit
       SecurityGroupIds:
         - !Ref NfsSG
@@ -26,7 +33,7 @@ Resources:
           Value: nfs 
       UserData:
         Fn::Base64: | 
-          !/bin/bash
+          #!/bin/bash
           
           apt update -y
           apt install -y vim zip tar wget git net-tools curl docker.io nfs-kernel-server
@@ -62,4 +69,5 @@ Resources:
 
           cat >>/etc/exports<<eof
           /mnt/nfs1 10.0.0.0/24(rw,sync,no_subtree_check,no_root_squash) 0 0 
+          eof
           systemctl restart nfs-kernel-server
