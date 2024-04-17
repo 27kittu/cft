@@ -563,7 +563,8 @@ Resources:
           apt-get install jenkins -y
           systemctl start jenkins
           systemctl enable jenkins
-          #Configure ansible user
+
+	  #Configure ansible user
           apt update -y
           apt install -y vim zip tar wget git net-tools curl docker.io
 
@@ -595,6 +596,9 @@ Resources:
     Properties:
       ImageId: ami-080e1f13689e07408
       InstanceType: t2.medium
+      SubnetId: !Ref K8sPubSubnet1
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
       KeyName: spirit
       Tags:
         - Key: Name
@@ -602,6 +606,28 @@ Resources:
       UserData:  
         Fn::Base64: | 
           #!/bin/bash
+
+          #Configure ansible user
+	  apt update -y
+	  apt install -y vim zip tar wget git net-tools curl openjdk-11-jdk
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+	  # configuring ansible
+	  username="ansible"
+	  password="ubuntu@user"
+	  adduser --gecos "" --disabled-password $username
+	  echo "${username}:${password}" | chpasswd
+	  # adding visudo file
+	  cp /etc/sudoers /etc/sudoers_copy
+	  sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+	  # changing Password authentication
+	  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+	  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+	  # restart sshd service
+	  systemctl restart sshd
 
           # Creating a new 'nexus' user
           sudo adduser -m -s /bin/bash -U nexus
@@ -612,6 +638,8 @@ Resources:
           mv /opt/nexus-3.65.0-02 /opt/sonatype-work /opt/nexus
           chown nexus:nexus -R /opt/nexus
           chmod 775 -R /opt/nexus
+	  /opt/nexus/nexus-3.65.0-02/bin/nexus start
+
   SonarInstance:
     Description: Instance to install sonarqube
     Type: AWS::EC2::Instance
@@ -619,33 +647,37 @@ Resources:
       ImageId: ami-080e1f13689e07408 
       InstanceType: t2.medium
       KeyName: spirit
+      SubnetId: !Ref K8sPubSubnet1
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
       Tags:
         - Key: Name
           Value: sonar
       UserData:  
         Fn::Base64: | 
           #!/bin/bash
-          apt update -y
-          apt install -y vim zip tar wget git net-tools curl java-11-openjdk-devel
-            
-          #changing vim default colorscheme
+
+          #Configure ansible user
+	  apt update -y
+	  apt install -y vim zip tar wget git net-tools curl openjdk-11-jdk
           cat > /etc/vim/vimrc <<eof
           syntax enable
           colorscheme ron
           autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
           eof
-          # configuring ansible
-          user="ansible"
-          pass="ec2@redhat"
-          useradd -m -U $user
-          echo "$pass" | passwd --stdin "$user"
-          # adding visudo file'
-          cp /etc/sudoers /etc/sudoers.bak
-          sed -i 's/root\s*ALL=(ALL)\s*ALL/root    ALL=(ALL)       ALL\nansible ALL=(ALL)       NOPASSWD: ALL/' /etc/sudoers
-          # changing Password authentication
-          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-          # restart sshd service
-          systemctl restart sshd
+	  # configuring ansible
+	  username="ansible"
+	  password="ubuntu@user"
+	  adduser --gecos "" --disabled-password $username
+	  echo "${username}:${password}" | chpasswd
+	  # adding visudo file
+	  cp /etc/sudoers /etc/sudoers_copy
+	  sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+	  # changing Password authentication
+	  cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+	  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+	  # restart sshd service
+	  systemctl restart sshd
 
           # Creating a new 'Sonar' user
           sudo adduser -m -s /bin/bash -U sonar
@@ -656,3 +688,7 @@ Resources:
           mv /opt/sonarqube-10.2.1.78527 /opt/sonarqube
           chown sonar:sonar -R /opt/sonarqube
           chmod 775 -R /opt/sonarqube
+	  /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+	  chmod 775 -R /opt/sonarqube
+	  /opt/sonarqube/bin/linux-x86-64/sonar.sh start
+
