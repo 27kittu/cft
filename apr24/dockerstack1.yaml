@@ -1,0 +1,119 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Stack to create docker swarm cluster
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: 192.168.0.0/24
+    Description: Cidr block for the VPC
+Resources:
+  SpiritVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: spirit
+  
+  PubSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref SpiritVpc
+      MapPublicIpOnLaunch: true
+      CidrBlock: 192.168.0.0/26
+      Tags:
+        - Key: Name
+          Value: spirit
+      
+  InternetGw1:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: spirit
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref SpiritVpc
+      InternetGatewayId: !Ref InternetGw1
+
+  RouteTable1:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref SpiritVpc
+      Tags:
+        - Key: Name
+          Value: spirit
+
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      SubnetId: !Ref PubSubnet1
+  #VpcRouteTableAssociation:
+  #Type: VPCRouteTableAssociation
+  #  Properties:
+  #    VpcId: !Ref SpiritVpc
+  #   RouteTableId: !Ref RouteTable1
+  Route1:               
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTable1
+      GatewayId: !Ref InternetGw1
+      DestinationCidrBlock: 0.0.0.0/0
+  SecurityGroup1:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable all
+      VpcId: !Ref SpiritVpc
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+  DockerMaster:
+    Description: Instance to create a docker master
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-080e1f13689e07408
+      InstanceType: t2.micro
+      SubnetId: !Ref PubSubnet1
+      KeyName: spirit
+      SecurityGroupIds:
+        - !Ref SecurityGroup1
+      Tags:
+        - Key: Name
+          Value: spirit
+      UserData:
+        Fn::Base64: | 
+          !/bin/bash
+          
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl docker.io
+
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+          
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+          
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          
+          # restart sshd service
+          systemctl restart sshd
+
+          
+
