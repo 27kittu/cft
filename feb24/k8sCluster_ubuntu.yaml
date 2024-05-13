@@ -64,6 +64,20 @@ Resources:
       Tags:
         - Key: Name
           Value: k8s
+  EC2SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "launch-wizard-2 created 2024-03-10T09:17:50.429Z"
+      GroupName: "launch-wizard-2"
+      VpcId: !Ref K8sVpc
+      SecurityGroupIngress: 
+        - 
+          CidrIp: "0.0.0.0/0"
+          IpProtocol: "-1"
+      SecurityGroupEgress: 
+        - 
+          CidrIp: "0.0.0.0/0"
+          IpProtocol: "-1"
   #SecurityGroup1:
   #  Type: 'AWS::EC2::SecurityGroup'
    # Properties:
@@ -125,8 +139,9 @@ Resources:
       ImageId: ami-03f4878755434977f
       KeyName: loyal
       SubnetId: !Ref K8sPubSubnet1
-      #SecurityGroupIds:
-       # - !Ref SecurityGroup2
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      SourceDestCheck: true
       Tags:
         - Key: Name
           Value: k8s0
@@ -190,9 +205,8 @@ Resources:
           apt-get install -y apt-transport-https ca-certificates curl
 
           # Download the Google Cloud public signing key:
-#          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
           # Update apt package index, install kubelet, kubeadm and kubectl
           apt-get update
           apt-get install -y kubelet kubeadm kubectl
@@ -204,7 +218,8 @@ Resources:
           systemctl daemon-reload
           systemctl start kubelet
           systemctl enable kubelet.service
-
+          
+          #Configure 'ansible' user
           apt update -y
           apt install -y vim zip tar wget git net-tools curl
 
@@ -228,12 +243,12 @@ Resources:
           # changing Password authentication
           cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
-          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 
 
           # restart sshd service
           systemctl restart sshd
-
+        
   K8sWorker1:
     Type: AWS::EC2::Instance
     Description: K8s worker instance in Public subnet
@@ -242,8 +257,9 @@ Resources:
       ImageId: ami-03f4878755434977f
       KeyName: loyal
       SubnetId: !Ref K8sPubSubnet1
-      #SecurityGroupIds:
-       # - !Ref SecurityGroup2
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      SourceDestCheck: true
       Tags:
         - Key: Name
           Value: k8s1
@@ -307,11 +323,8 @@ Resources:
           apt-get install -y apt-transport-https ca-certificates curl
 
           # Download the Google Cloud public signing key:
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-          #curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
           # Update apt package index, install kubelet, kubeadm and kubectl
           apt-get update
           apt-get install -y kubelet kubeadm kubectl
@@ -323,7 +336,6 @@ Resources:
           systemctl daemon-reload
           systemctl start kubelet
           systemctl enable kubelet.service
-
 
           apt update -y
           apt install -y vim zip tar wget git net-tools curl
@@ -348,11 +360,13 @@ Resources:
           # changing Password authentication
           cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
-          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
 
 
           # restart sshd service
           systemctl restart sshd
+
+
   K8sWorker2:
     Type: AWS::EC2::Instance
     Description: K8s worker instance in Public subnet
@@ -360,8 +374,9 @@ Resources:
       InstanceType: t2.micro
       ImageId: ami-03f4878755434977f
       KeyName: loyal
-      #SecurityGroupIds:
-       # - !Ref SecurityGroup2
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      SourceDestCheck: true
       SubnetId: !Ref K8sPubSubnet1
       Tags:
         - Key: Name 
@@ -426,10 +441,8 @@ Resources:
           apt-get install -y apt-transport-https ca-certificates curl
 
           # Download the Google Cloud public signing key:
-          curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-          echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-
-
+          curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+          echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
           # Update apt package index, install kubelet, kubeadm and kubectl
           apt-get update
           apt-get install -y kubelet kubeadm kubectl
@@ -444,29 +457,22 @@ Resources:
 
           apt update -y
           apt install -y vim zip tar wget git net-tools curl
-
           #changing vim default colorscheme
           cat > /etc/vim/vimrc <<eof
           syntax enable
           colorscheme ron
           autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
           eof
-
           # configuring ansible
           username="ansible"
           password="ubuntu@user"
           adduser --gecos "" --disabled-password $username
           echo "${username}:${password}" | chpasswd
-
           # adding visudo file
           cp /etc/sudoers /etc/sudoers_copy
           sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
-
           # changing Password authentication
           cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-
-          sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-
-
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
           # restart sshd service
           systemctl restart sshd

@@ -1,0 +1,172 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: This template creates all the infrastructure for Docker including security groups in a ready-to-use manner
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Description: Cidrblock to assign to the VPC
+    Default: 10.0.0.0/24
+  KeyPair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of the existing keypair
+    Default: success
+Resources:
+  MiniVpc:
+    Type: AWS::EC2::VPC
+    Description: VPC dedicated for Docker 
+    Properties: 
+      CidrBlock: !Ref VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: docker
+  MiniPubSubnet1:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for Docker server placement
+    Properties:
+      VpcId: !Ref MiniVpc
+      CidrBlock: 10.0.0.0/26
+      MapPublicIpOnLaunch: true
+#      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: docker
+  MiniPubSubnet2:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for Docker server placement
+    Properties:
+      VpcId: !Ref MiniVpc
+      CidrBlock: 10.0.0.64/26
+      MapPublicIpOnLaunch: true
+#      AvailabilityZone: us-east-1a
+      Tags:
+        - Key: Name
+          Value: docker 
+  MiniPubSubnet3:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for Docker server placement
+    Properties:
+      VpcId: !Ref MiniVpc
+      CidrBlock: 10.0.0.128/26
+      MapPublicIpOnLaunch: true
+#      AvailabilityZone: us-east-1a #ap-south-1b
+      Tags:
+        - Key: Name
+          Value: docker
+  MiniPubSubnet4:
+    Type: AWS::EC2::Subnet
+    Description: Public Subnet for docker server placement
+    Properties:
+      VpcId: !Ref MiniVpc
+      CidrBlock: 10.0.0.192/26
+      MapPublicIpOnLaunch: true
+#      AvailabilityZone: us-east-1a #ap-south-1b
+      Tags:
+        - Key: Name
+          Value: docker
+  EC2SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Ingress allowed for all"
+      GroupName: "ingress1"
+      VpcId: !Ref MiniVpc
+      SecurityGroupIngress: 
+        - 
+          CidrIp: "0.0.0.0/0"
+          IpProtocol: "-1"
+      SecurityGroupEgress: 
+        - 
+          CidrIp: "0.0.0.0/0"
+          IpProtocol: "-1"
+  #SecurityGroup1:
+  #  Type: 'AWS::EC2::SecurityGroup'
+   # Properties:
+   #   GroupDescription: Allow connections from specified source security group
+  #SGroupIngress:
+  #  Type: AWS::EC2::SecurityGroupIngress
+    #Properties:
+     # - IpProtocol: '-1'
+      #  FromPort: '0'
+       ## ToPort: '65535'
+        #SourceSecurityGroupName: !Ref SecurityGroup1
+        #SourceSecurityGroupOwnerId: '654654506058'
+#  SecurityGroup2:
+ #   Type: 'AWS::EC2::SecurityGroup'
+  #  Properties:
+   #   GroupDescription: Allow connections from specified source security group
+    #  SecurityGroupIngress:
+     # - IpProtocol: '-1'
+      #  FromPort: '0'
+       # ToPort: '65535'
+        #CidrIp: 0.0.0.0/0
+  MiniInternetGw:
+    Type: AWS::EC2::InternetGateway
+    Description: Internet gateway for the VPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: docker
+  VpcToInternet:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MiniVpc
+      InternetGatewayId: !Ref MiniInternetGw
+  MiniPubRt:
+    Type: AWS::EC2::RouteTable
+    Description: RouteTable for MiniVpc
+    Properties: 
+      VpcId: !Ref MiniVpc
+  MiniPubRou1:
+    Type: AWS::EC2::Route
+    Description: Route from Vpc to InternetGw
+    DependsOn:
+      - MiniInternetGw
+    Properties:
+      RouteTableId: !Ref MiniPubRt
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MiniInternetGw
+  MiniPubSubnetAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Description: Route from Vpc to subnet1
+    Properties:
+      SubnetId: !Ref MiniPubSubnet1
+      RouteTableId: !Ref MiniPubRt
+  Docker1:
+    Type: AWS::EC2::Instance
+    Description: An instance in Public subnet
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-080e1f13689e07408 
+      KeyName: !Ref KeyPair
+      SubnetId: !Ref MiniPubSubnet1
+      SecurityGroupIds:
+        - !Ref EC2SecurityGroup
+      SourceDestCheck: true
+      Tags:
+        - Key: Name
+          Value: doc0_ans0
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          #Configure 'ansible' user
+          apt update -y
+          apt install -y vim zip tar wget git net-tools curl docker.io python-is-python3 python3-pip virtualenv
+          #changing vim default colorscheme
+          cat > /etc/vim/vimrc <<eof
+          syntax enable
+          colorscheme ron
+          autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+          eof
+          # configuring ansible
+          username="ansible"
+          password="ubuntu@user"
+          adduser --gecos "" --disabled-password $username
+          echo "${username}:${password}" | chpasswd
+          # adding visudo file
+          cp /etc/sudoers /etc/sudoers_copy
+          sed -i 's/^root.*ALL$/root    ALL=(ALL:ALL) ALL\nansible ALL=(ALL)     NOPASSWD: ALL/' /etc/sudoers
+          # changing Password authentication
+          cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+          sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/g' /etc/ssh/sshd_config && sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+          # restart sshd service
+          systemctl restart sshd

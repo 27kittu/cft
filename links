@@ -1,0 +1,19 @@
+Templates Anotomy:
+-----
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-anatomy.html
+
+AWS Template reference:
+----------
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html
+
+Transform reference or Template Macros:
+----
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-macros.html
+
+Intrinsic function reference:
+-------
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference.html
+
+Already created standart stacks:
+------
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/deploying.applications.html

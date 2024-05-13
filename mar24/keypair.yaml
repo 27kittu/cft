@@ -1,0 +1,8 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creates keypair for this account with name 'success.pem'
+Resources:
+  NewKeyPair:
+    Type: AWS::EC2::KeyPair
+    Description: Creating keypair success.pem
+    Properties:
+      KeyName: success 
